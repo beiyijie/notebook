@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记事本系统 - 主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #1890ff;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info span {
+            margin-right: 20px;
+        }
+        
+        .logout-btn {
+            background: none;
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+        
+        .sidebar {
+            width: 200px;
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .panel {
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            background-color: #1890ff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #40a9ff;
+        }
+        
+        .btn-danger {
+            background-color: #ff4d4f;
+        }
+        
+        .btn-danger:hover {
+            background-color: #ff7875;
+        }
+        
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-group label {
+            margin-right: 5px;
+        }
+        
+        .form-control {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background-color: #fafafa;
+        }
+        
+        .event-urgent {
+            color: #ff4d4f;
+            font-weight: bold;
+        }
+        
+        .event-important {
+            color: #faad14;
+            font-weight: bold;
+        }
+        
+        .event-normal {
+            color: #8c8c8c;
+        }
+        
+        .action-btn {
+            margin-right: 10px;
+            color: #1890ff;
+            cursor: pointer;
+        }
+        
+        .action-btn:hover {
+            text-decoration: underline;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            border-radius: 4px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .modal-close {
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            text-align: right;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        textarea.form-control {
+            height: 100px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>记事本系统</h1>
+        <div class="user-info">
+            <span id="userName">加载中...</span>
+            <button class="logout-btn" id="logoutBtn">退出</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <div class="menu-item active" data-page="event">事件管理</div>
+            <div class="menu-item" data-page="category">分类管理</div>
+        </div>
+        
+        <div class="content">
+            <!-- 事件管理页面 -->
+            <div class="page" id="eventPage">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">事件列表</div>
+                        <button class="btn" id="addEventBtn">新增事件</button>
+                    </div>
+                    
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label for="searchTitle">标题：</label>
+                            <input type="text" class="form-control" id="searchTitle">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchCategory">分类：</label>
+                            <select class="form-control" id="searchCategory">
+                                <option value="">全部</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchLevel">级别：</label>
+                            <select class="form-control" id="searchLevel">
+                                <option value="">全部</option>
+                                <option value="紧急">紧急</option>
+                                <option value="重要">重要</option>
+                                <option value="一般">一般</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="searchStatus">状态：</label>
+                            <select class="form-control" id="searchStatus">
+                                <option value="">全部</option>
+                                <option value="未完成">未完成</option>
+                                <option value="已完成">已完成</option>
+                                <option value="作废">作废</option>
+                            </select>
+                        </div>
+                        <button class="btn" id="searchBtn">查询</button>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>标题</th>
+                                <th>分类</th>
+                                <th>开始日期</th>
+                                <th>结束日期</th>
+                                <th>级别</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventList">
+                            <!-- 事件列表 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 分类管理页面 -->
+            <div class="page" id="categoryPage" style="display: none;">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">分类列表</div>
+                        <button class="btn" id="addCategoryBtn">新增分类</button>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>分类名称</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryList">
+                            <!-- 分类列表 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 事件表单模态框 -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="eventModalTitle">新增事件</div>
+                <button class="modal-close" id="closeEventModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm">
+                    <input type="hidden" id="eventId">
+                    <div class="form-group">
+                        <label for="eventTitle">标题</label>
+                        <input type="text" class="form-control" id="eventTitle" placeholder="请输入标题">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventCategory">分类</label>
+                        <select class="form-control" id="eventCategory">
+                            <!-- 分类选项 -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventStartDate">开始日期</label>
+                        <input type="date" class="form-control" id="eventStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventEndDate">结束日期</label>
+                        <input type="date" class="form-control" id="eventEndDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventLevel">级别</label>
+                        <select class="form-control" id="eventLevel">
+                            <option value="紧急">紧急</option>
+                            <option value="重要" selected>重要</option>
+                            <option value="一般">一般</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventStatus">状态</label>
+                        <select class="form-control" id="eventStatus">
+                            <option value="未完成" selected>未完成</option>
+                            <option value="已完成">已完成</option>
+                            <option value="作废">作废</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventContent">内容</label>
+                        <textarea class="form-control" id="eventContent" placeholder="请输入内容"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="saveEventBtn">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 分类表单模态框 -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="categoryModalTitle">新增分类</div>
+                <button class="modal-close" id="closeCategoryModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <input type="hidden" id="categoryId">
+                    <div class="form-group">
+                        <label for="categoryName">分类名称</label>
+                        <input type="text" class="form-control" id="categoryName" placeholder="请输入分类名称">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="saveCategoryBtn">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查用户登录状态
+            checkLoginStatus();
+            
+            // 加载分类列表
+            loadCategories();
+            
+            // 加载事件列表
+            loadEvents();
+            
+            // 菜单切换
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // 移除所有激活状态
+                    document.querySelectorAll('.menu-item').forEach(menu => menu.classList.remove('active'));
+                    document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
+                    
+                    // 添加激活状态
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.page + 'Page').style.display = 'block';
+                });
+            });
+            
+            // 退出登录
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                fetch('/api/user/logout', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        window.location.href = '../index.html';
+                    }
+                });
+            });
+            
+            // 查询事件
+            document.getElementById('searchBtn').addEventListener('click', function() {
+                loadEvents();
+            });
+            
+            // 新增事件
+            document.getElementById('addEventBtn').addEventListener('click', function() {
+                document.getElementById('eventModalTitle').textContent = '新增事件';
+                document.getElementById('eventId').value = '';
+                document.getElementById('eventForm').reset();
+                document.getElementById('eventModal').classList.add('active');
+            });
+            
+            // 关闭事件模态框
+            document.getElementById('closeEventModal').addEventListener('click', function() {
+                document.getElementById('eventModal').classList.remove('active');
+            });
+            
+            // 保存事件
+            document.getElementById('saveEventBtn').addEventListener('click', function() {
+                const eventId = document.getElementById('eventId').value;
+                const eventData = {
+                    title: document.getElementById('eventTitle').value,
+                    categoryId: document.getElementById('eventCategory').value,
+                    startDate: document.getElementById('eventStartDate').value,
+                    endDate: document.getElementById('eventEndDate').value,
+                    level: document.getElementById('eventLevel').value,
+                    status: document.getElementById('eventStatus').value,
+                    content: document.getElementById('eventContent').value
+                };
+                
+                if (eventId) {
+                    // 修改事件
+                    eventData.id = eventId;
+                    fetch('/api/event/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(eventData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            document.getElementById('eventModal').classList.remove('active');
+                            loadEvents();
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+                } else {
+                    // 新增事件
+                    fetch('/api/event/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(eventData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            document.getElementById('eventModal').classList.remove('active');
+                            loadEvents();
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+                }
+            });
+            
+            // 新增分类
+            document.getElementById('addCategoryBtn').addEventListener('click', function() {
+                document.getElementById('categoryModalTitle').textContent = '新增分类';
+                document.getElementById('categoryId').value = '';
+                document.getElementById('categoryForm').reset();
+                document.getElementById('categoryModal').classList.add('active');
+            });
+            
+            // 关闭分类模态框
+            document.getElementById('closeCategoryModal').addEventListener('click', function() {
+                document.getElementById('categoryModal').classList.remove('active');
+            });
+            
+            // 保存分类
+            document.getElementById('saveCategoryBtn').addEventListener('click', function() {
+                const categoryId = document.getElementById('categoryId').value;
+                const categoryData = {
+                    name: document.getElementById('categoryName').value
+                };
+                
+                if (categoryId) {
+                    // 修改分类
+                    categoryData.id = categoryId;
+                    fetch('/api/category/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(categoryData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            document.getElementById('categoryModal').classList.remove('active');
+                            loadCategories();
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+                } else {
+                    // 新增分类
+                    fetch('/api/category/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(categoryData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200) {
+                            document.getElementById('categoryModal').classList.remove('active');
+                            loadCategories();
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+                }
+            });
+        });
+        
+        // 检查用户登录状态
+        function checkLoginStatus() {
+            fetch('/api/user/info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        // 显示用户名
+                        document.getElementById('userName').textContent = data.data.name;
+                    } else {
+                        // 未登录，跳转到登录页
+                        window.location.href = '../index.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('获取用户信息失败', error);
+                    window.location.href = '../index.html';
+                });
+        }
+        
+        // 加载分类列表
+        function loadCategories() {
+            fetch('/api/category/list')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        // 更新分类下拉框
+                        const categorySelect = document.getElementById('eventCategory');
+                        const searchCategorySelect = document.getElementById('searchCategory');
+                        
+                        // 清空现有选项
+                        categorySelect.innerHTML = '';
+                        searchCategorySelect.innerHTML = '<option value="">全部</option>';
+                        
+                        // 添加分类选项
+                        data.data.forEach(category => {
+                            categorySelect.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+                            searchCategorySelect.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+                        });
+                        
+                        // 更新分类列表
+                        const categoryList = document.getElementById('categoryList');
+                        categoryList.innerHTML = '';
+                        
+                        data.data.forEach(category => {
+                            categoryList.innerHTML += `
+                                <tr>
+                                    <td>${category.name}</td>
+                                    <td>${category.createTime}</td>
+                                    <td>
+                                        <span class="action-btn" onclick="editCategory(${category.id})">编辑</span>
+                                        <span class="action-btn" onclick="deleteCategory(${category.id})">删除</span>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                });
+        }
+        
+        // 加载事件列表
+        function loadEvents() {
+            // 获取查询参数
+            const title = document.getElementById('searchTitle').value;
+            const categoryId = document.getElementById('searchCategory').value;
+            const level = document.getElementById('searchLevel').value;
+            const status = document.getElementById('searchStatus').value;
+            
+            // 构建查询URL
+            let url = '/api/event/list?';
+            if (title) {
+                url += `title=${encodeURIComponent(title)}&`;
+            }
+            if (categoryId) {
+                url += `categoryId=${categoryId}&`;
+            }
+            if (level) {
+                url += `level=${encodeURIComponent(level)}&`;
+            }
+            if (status) {
+                url += `status=${encodeURIComponent(status)}&`;
+            }
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        const eventList = document.getElementById('eventList');
+                        eventList.innerHTML = '';
+                        
+                        data.data.forEach(event => {
+                            // 根据级别设置样式
+                            let levelClass = '';
+                            if (event.level === '紧急') {
+                                levelClass = 'event-urgent';
+                            } else if (event.level === '重要') {
+                                levelClass = 'event-important';
+                            } else {
+                                levelClass = 'event-normal';
+                            }
+                            
+                            eventList.innerHTML += `
+                                <tr>
+                                    <td>${event.title}</td>
+                                    <td>${event.categoryName}</td>
+                                    <td>${event.startDate}</td>
+                                    <td>${event.endDate}</td>
+                                    <td class="${levelClass}">${event.level}</td>
+                                    <td>${event.status}</td>
+                                    <td>
+                                        <span class="action-btn" onclick="editEvent(${event.id})">编辑</span>
+                                        <span class="action-btn" onclick="deleteEvent(${event.id})">删除</span>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                });
+        }
+        
+        // 编辑事件
+        function editEvent(id) {
+            fetch(`/api/event/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        const event = data.data;
+                        
+                        document.getElementById('eventModalTitle').textContent = '修改事件';
+                        document.getElementById('eventId').value = event.id;
+                        document.getElementById('eventTitle').value = event.title;
+                        document.getElementById('eventCategory').value = event.categoryId;
+                        document.getElementById('eventStartDate').value = event.startDate;
+                        document.getElementById('eventEndDate').value = event.endDate;
+                        document.getElementById('eventLevel').value = event.level;
+                        document.getElementById('eventStatus').value = event.status;
+                        document.getElementById('eventContent').value = event.content;
+                        
+                        document.getElementById('eventModal').classList.add('active');
+                    }
+                });
+        }
+        
+        // 删除事件
+        function deleteEvent(id) {
+            if (confirm('确定要删除该事件吗？')) {
+                fetch(`/api/event/delete/${id}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        loadEvents();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            }
+        }
+        
+        // 编辑分类
+        function editCategory(id) {
+            fetch(`/api/category/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        const category = data.data;
+                        
+                        document.getElementById('categoryModalTitle').textContent = '修改分类';
+                        document.getElementById('categoryId').value = category.id;
+                        document.getElementById('categoryName').value = category.name;
+                        
+                        document.getElementById('categoryModal').classList.add('active');
+                    }
+                });
+        }
+        
+        // 删除分类
+        function deleteCategory(id) {
+            if (confirm('确定要删除该分类吗？')) {
+                fetch(`/api/category/delete/${id}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        loadCategories();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

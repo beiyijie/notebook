@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.notebook.dao.CategoryDao">
+    <!-- 结果映射 -->
+    <resultMap id="categoryMap" type="com.notebook.entity.Category">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="userId" column="user_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+    
+    <!-- 通用查询列 -->
+    <sql id="categoryColumns">
+        id, name, user_id, create_time
+    </sql>
+    
+    <!-- 新增分类 -->
+    <insert id="insert" parameterType="com.notebook.entity.Category" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_category (name, user_id)
+        VALUES (#{name}, #{userId})
+    </insert>
+    
+    <!-- 根据ID删除分类 -->
+    <delete id="delete">
+        DELETE FROM t_category
+        WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+    
+    <!-- 更新分类 -->
+    <update id="update" parameterType="com.notebook.entity.Category">
+        UPDATE t_category
+        SET name = #{name}
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+    
+    <!-- 根据ID查询分类 -->
+    <select id="findById" resultMap="categoryMap">
+        SELECT <include refid="categoryColumns"/>
+        FROM t_category
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 根据用户ID查询分类列表 -->
+    <select id="findByUserId" resultMap="categoryMap">
+        SELECT <include refid="categoryColumns"/>
+        FROM t_category
+        WHERE user_id = #{userId}
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 根据用户ID和分类名称查询分类 -->
+    <select id="selectByUserIdAndName" resultMap="categoryMap">
+        SELECT <include refid="categoryColumns"/>
+        FROM t_category
+        WHERE user_id = #{userId} AND name = #{name}
+    </select>
+    
+    <!-- 查询分类下是否有事件 -->
+    <select id="countEventByCategoryId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM tb_event
+        WHERE category_id = #{categoryId}
+    </select>
+
+    <!-- 检查分类名称是否存在 -->
+    <select id="checkNameExist" resultType="int">
+        SELECT COUNT(*)
+        FROM t_category
+        WHERE name = #{name} AND user_id = #{userId}
+    </select>
+</mapper> 

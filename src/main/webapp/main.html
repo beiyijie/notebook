@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记事本系统 - 主页</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+            background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+            color: #fff;
+            transition: all 0.3s ease;
+            width: 16.666667%;  /* 确保侧边栏宽度固定为col-md-2的宽度 */
+        }
+        .content {
+            margin-left: 16.666667%;  /* 调整为与sidebar宽度一致 */
+            padding: 30px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            background: rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            padding: 12px 20px;
+            border-radius: 0;
+            transition: all 0.2s;
+            margin: 5px 0;
+        }
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white !important;
+            border-left: 4px solid #3498db;
+        }
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.05);
+            color: white !important;
+            transform: translateX(5px);
+        }
+        .event-card {
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .event-card .card-body {
+            background-color: transparent;
+        }
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .priority-high {
+            background-color: #ffcdd2;
+            border-left: 4px solid #e74c3c;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        .priority-high .card-body {
+            background-color: transparent;
+        }
+        .priority-high .card-title {
+            color: #c0392b;
+            font-weight: bold;
+        }
+        .priority-medium {
+            background-color: #ffe0b2;
+            border-left: 4px solid #f39c12;
+        }
+        .priority-medium .card-body {
+            background-color: transparent;
+        }
+        .priority-low {
+            background-color: #c8e6c9;
+            border-left: 4px solid #2ecc71;
+        }
+        .priority-low .card-body {
+            background-color: transparent;
+        }
+        .status-completed {
+            opacity: 0.7;
+            background-color: #f8f9fa !important;
+        }
+        .status-completed .card-body {
+            background-color: transparent !important;
+        }
+        .pointer {
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #3498db 0%, #2980b9 100%);
+            border: none;
+            box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #2980b9 0%, #2c3e50 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(52, 152, 219, 0.3);
+        }
+        .card {
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .card-header {
+            border-top-left-radius: 8px !important;
+            border-top-right-radius: 8px !important;
+            background-color: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        h2 {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .btn {
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+        .form-control {
+            border-radius: 6px;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            width: 100%;
+            text-overflow: ellipsis;  /* 如果文本溢出则显示省略号 */
+        }
+        select.form-control {
+            padding-right: 30px;  /* 为下拉箭头留出空间 */
+        }
+        select.form-control option {
+            padding: 10px;  /* 增加选项内边距 */
+            min-width: 100%;  /* 确保选项宽度至少与select一样宽 */
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            border-color: #3498db;
+        }
+        .category-card {
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .modal-content {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            background-color: #f8f9fa;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .modal-footer {
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        #userInfo {
+            padding: 20px 0;
+            background: rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .user-icon {
+            background: rgba(255,255,255,0.1);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #7f8c8d;
+        }
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+        #categoryList .card,
+        #eventList .card {
+            height: 100%;  /* 统一卡片高度 */
+        }
+        .col-md-4 {
+            margin-bottom: 20px;  /* 增加间距使布局更均匀 */
+        }
+        /* 调整分类布局相关样式 */
+        #categoryList {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;  /* 负外边距抵消内部padding */
+            justify-content: center; /* 居中显示分类卡片 */
+        }
+        #categoryList > div {
+            padding: 0 10px;
+            display: flex;  /* 使用flexbox布局 */
+        }
+        #categoryList .card {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        #categoryList .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #categoryList .btn-group {
+            margin-top: auto;  /* 按钮组固定在底部 */
+        }
+        /* 统一各部分布局样式 */
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+        
+        #eventList {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #eventList .card {
+            width: 100%;
+            max-width: 900px; /* 控制事件卡片最大宽度 */
+        }
+        
+        .empty-state {
+            width: 100%;
+            max-width: 500px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        
+        /* 确保搜索条件栏内容对齐 */
+        .card .row {
+            justify-content: center;
+        }
+        
+        /* 修复模态框中的表单布局 */
+        .modal-body .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="col-md-2 bg-white sidebar">
+        <div class="logo">记事本系统</div>
+        <div class="mt-3 text-center" id="userInfo">
+            <div class="user-icon mb-2">
+                <i class="fas fa-user-circle fa-2x text-white"></i>
+            </div>
+            <div class="font-weight-bold text-white" id="username">用户名</div>
+            <div class="small text-white-50" id="email">邮箱</div>
+        </div>
+        <hr class="mt-0 mb-3" style="border-color: rgba(255,255,255,0.1);">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-section="events">
+                    <i class="fas fa-list-ul mr-2"></i>所有事件
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="categories">
+                    <i class="fas fa-folder mr-2"></i>分类管理
+                </a>
+            </li>
+            <li class="nav-item" id="categoryNavItems">
+                <!-- 分类导航项将动态添加 -->
+            </li>
+        </ul>
+        <div class="mt-auto p-3" style="position: absolute; bottom: 0; width: 100%;">
+            <button class="btn btn-danger btn-sm btn-block" id="logoutBtn">
+                <i class="fas fa-sign-out-alt mr-2"></i>退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="content">
+        <!-- 所有事件部分 -->
+        <div class="section" id="eventsSection">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-list-ul mr-2"></i>所有事件</h2>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addEventModal">
+                    <i class="fas fa-plus mr-2"></i>添加事件
+                </button>
+            </div>
+            
+            <!-- 事件搜索条件 -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="categoryFilter">分类</label>
+                                <select class="form-control" id="categoryFilter">
+                                    <option value="">全部</option>
+                                    <!-- 分类选项将动态添加 -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="priorityFilter">优先级</label>
+                                <select class="form-control" id="priorityFilter">
+                                    <option value="">全部</option>
+                                    <option value="2">高</option>
+                                    <option value="1">中</option>
+                                    <option value="0">低</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="statusFilter">状态</label>
+                                <select class="form-control" id="statusFilter">
+                                    <option value="">全部</option>
+                                    <option value="0">未完成</option>
+                                    <option value="1">已完成</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="keywordFilter">关键词</label>
+                                <input type="text" class="form-control" id="keywordFilter" placeholder="标题或内容">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <button class="btn btn-primary" id="searchBtn">
+                            <i class="fas fa-search mr-2"></i>搜索
+                        </button>
+                        <button class="btn btn-secondary" id="resetBtn">
+                            <i class="fas fa-sync-alt mr-2"></i>重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 事件列表 -->
+            <div id="eventList" class="fade-in">
+                <!-- 事件卡片将动态添加 -->
+                <div id="emptyEventState" class="empty-state">
+                    <i class="fas fa-clipboard"></i>
+                    <h4>没有找到事件</h4>
+                    <p>点击上方的"添加事件"按钮创建一个新事件</p>
+                    <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addEventModal">
+                        <i class="fas fa-plus mr-2"></i>添加事件
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类管理部分 -->
+        <div class="section d-none" id="categoriesSection">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-folder mr-2"></i>分类管理</h2>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+                    <i class="fas fa-plus mr-2"></i>添加分类
+                </button>
+            </div>
+            
+            <!-- 分类列表 -->
+            <div class="row fade-in" id="categoryList">
+                <!-- 分类卡片将动态添加 -->
+                <div id="emptyCategoryState" class="empty-state col-12">
+                    <i class="fas fa-folder-open"></i>
+                    <h4>没有找到分类</h4>
+                    <p>点击上方的"添加分类"按钮创建一个新分类</p>
+                    <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addCategoryModal">
+                        <i class="fas fa-plus mr-2"></i>添加分类
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加事件模态框 -->
+    <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEventModalLabel">添加事件</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEventForm">
+                        <input type="hidden" id="eventId">
+                        <div class="form-group">
+                            <label for="eventTitle">标题</label>
+                            <input type="text" class="form-control" id="eventTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventContent">内容</label>
+                            <textarea class="form-control" id="eventContent" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="eventCategory">分类</label>
+                                    <select class="form-control" id="eventCategory">
+                                        <option value="">无分类</option>
+                                        <!-- 分类选项将动态添加 -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="eventPriority">优先级</label>
+                                    <select class="form-control" id="eventPriority">
+                                        <option value="0">低</option>
+                                        <option value="1">中</option>
+                                        <option value="2">高</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="eventStatus">状态</label>
+                                    <select class="form-control" id="eventStatus">
+                                        <option value="0">未完成</option>
+                                        <option value="1">已完成</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveEventBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加分类模态框 -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">添加分类</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCategoryForm">
+                        <input type="hidden" id="categoryId">
+                        <div class="form-group">
+                            <label for="categoryName">分类名称</label>
+                            <input type="text" class="form-control" id="categoryName" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveCategoryBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 当前用户信息
+        let currentUser = null;
+        
+        // 页面加载完成后执行
+        $(document).ready(function() {
+            // 获取当前用户信息
+            getUserInfo();
+            
+            // 获取分类列表
+            getCategories();
+            
+            // 获取事件列表
+            getEvents();
+            
+            // 导航切换
+            $('.nav-link').click(function() {
+                $('.nav-link').removeClass('active');
+                $(this).addClass('active');
+                
+                const section = $(this).data('section');
+                $('.section').addClass('d-none');
+                $(`#${section}Section`).removeClass('d-none');
+            });
+            
+            // 退出登录
+            $('#logoutBtn').click(function() {
+                $.ajax({
+                    url: 'user/logout',
+                    type: 'GET',
+                    success: function(res) {
+                        if (res.code === 200) {
+                            window.location.href = 'index.html';
+                        }
+                    }
+                });
+            });
+            
+            // 搜索事件
+            $('#searchBtn').click(function() {
+                getEvents();
+            });
+            
+            // 重置搜索条件
+            $('#resetBtn').click(function() {
+                $('#categoryFilter').val('');
+                $('#priorityFilter').val('');
+                $('#statusFilter').val('');
+                $('#keywordFilter').val('');
+                getEvents();
+            });
+            
+            // 保存事件
+            $('#saveEventBtn').click(function() {
+                const eventId = $('#eventId').val();
+                const event = {
+                    title: $('#eventTitle').val(),
+                    content: $('#eventContent').val(),
+                    categoryId: $('#eventCategory').val() || null,
+                    priority: $('#eventPriority').val(),
+                    status: $('#eventStatus').val()
+                };
+                
+                if (eventId) {
+                    // 更新事件
+                    event.id = eventId;
+                    $.ajax({
+                        url: 'event/update',
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(event),
+                        success: function(res) {
+                            if (res.code === 200) {
+                                $('#addEventModal').modal('hide');
+                                getEvents();
+                            } else {
+                                alert(res.message);
+                            }
+                        }
+                    });
+                } else {
+                    // 添加事件
+                    $.ajax({
+                        url: 'event/add',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(event),
+                        success: function(res) {
+                            if (res.code === 200) {
+                                $('#addEventModal').modal('hide');
+                                getEvents();
+                            } else {
+                                alert(res.message);
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // 保存分类
+            $('#saveCategoryBtn').click(function() {
+                const categoryId = $('#categoryId').val();
+                const category = {
+                    name: $('#categoryName').val()
+                };
+                
+                if (categoryId) {
+                    // 更新分类
+                    category.id = categoryId;
+                    $.ajax({
+                        url: 'category/update',
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(category),
+                        success: function(res) {
+                            if (res.code === 200) {
+                                $('#addCategoryModal').modal('hide');
+                                getCategories();
+                            } else {
+                                alert(res.message);
+                            }
+                        }
+                    });
+                } else {
+                    // 添加分类
+                    $.ajax({
+                        url: 'category/add',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(category),
+                        success: function(res) {
+                            if (res.code === 200) {
+                                $('#addCategoryModal').modal('hide');
+                                getCategories();
+                            } else {
+                                alert(res.message);
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // 模态框显示前清空表单
+            $('#addEventModal').on('show.bs.modal', function(e) {
+                const button = $(e.relatedTarget);
+                const eventId = button.data('id');
+                
+                // 清空表单
+                $('#eventId').val('');
+                $('#addEventForm')[0].reset();
+                
+                if (eventId) {
+                    // 编辑事件
+                    $('#addEventModalLabel').text('编辑事件');
+                    $.ajax({
+                        url: `event/info/${eventId}`,
+                        type: 'GET',
+                        success: function(res) {
+                            if (res.code === 200) {
+                                const event = res.data;
+                                $('#eventId').val(event.id);
+                                $('#eventTitle').val(event.title);
+                                $('#eventContent').val(event.content);
+                                $('#eventCategory').val(event.categoryId);
+                                $('#eventPriority').val(event.priority);
+                                $('#eventStatus').val(event.status);
+                            }
+                        }
+                    });
+                } else {
+                    // 添加事件
+                    $('#addEventModalLabel').text('添加事件');
+                }
+            });
+            
+            // 模态框显示前清空表单
+            $('#addCategoryModal').on('show.bs.modal', function(e) {
+                const button = $(e.relatedTarget);
+                const categoryId = button.data('id');
+                
+                // 清空表单
+                $('#categoryId').val('');
+                $('#addCategoryForm')[0].reset();
+                
+                if (categoryId) {
+                    // 编辑分类
+                    $('#addCategoryModalLabel').text('编辑分类');
+                    $.ajax({
+                        url: `category/info/${categoryId}`,
+                        type: 'GET',
+                        success: function(res) {
+                            if (res.code === 200) {
+                                const category = res.data;
+                                $('#categoryId').val(category.id);
+                                $('#categoryName').val(category.name);
+                            }
+                        }
+                    });
+                } else {
+                    // 添加分类
+                    $('#addCategoryModalLabel').text('添加分类');
+                }
+            });
+            
+            // 显示/隐藏空状态
+            function toggleEmptyState(selector, isEmpty) {
+                if (isEmpty) {
+                    $(selector).show();
+                } else {
+                    $(selector).hide();
+                }
+            }
+            
+            // 初始化时检查事件和分类列表
+            setTimeout(function() {
+                if ($("#eventList .event-card").length === 0) {
+                    toggleEmptyState("#emptyEventState", true);
+                } else {
+                    toggleEmptyState("#emptyEventState", false);
+                }
+                
+                if ($("#categoryList .category-card").length === 0) {
+                    toggleEmptyState("#emptyCategoryState", true);
+                } else {
+                    toggleEmptyState("#emptyCategoryState", false);
+                }
+            }, 500);
+            
+            // 为每个新添加的元素添加动画类
+            function addFadeInClass(element) {
+                $(element).addClass('fade-in');
+                setTimeout(function() {
+                    $(element).removeClass('fade-in');
+                }, 500);
+            }
+            
+            // 重写原有的添加事件卡片函数，添加动画效果
+            var originalAddEventCard = window.addEventCard || function() {};
+            window.addEventCard = function(event) {
+                toggleEmptyState("#emptyEventState", false);
+                var result = originalAddEventCard.apply(this, arguments);
+                addFadeInClass($("#event-" + event.id));
+                return result;
+            };
+            
+            // 重写原有的添加分类卡片函数，添加动画效果
+            var originalAddCategoryCard = window.addCategoryCard || function() {};
+            window.addCategoryCard = function(category) {
+                toggleEmptyState("#emptyCategoryState", false);
+                var result = originalAddCategoryCard.apply(this, arguments);
+                addFadeInClass($("#category-" + category.id));
+                return result;
+            };
+        });
+        
+        // 获取当前用户信息
+        function getUserInfo() {
+            $.ajax({
+                url: 'user/info',
+                type: 'GET',
+                success: function(res) {
+                    if (res.code === 200) {
+                        currentUser = res.data;
+                        $('#username').text(currentUser.username);
+                        $('#email').text(currentUser.email || '未设置邮箱');
+                    } else {
+                        // 未登录，跳转到登录页
+                        window.location.href = 'index.html';
+                    }
+                },
+                error: function() {
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+        
+        // 获取分类列表
+        function getCategories() {
+            $.ajax({
+                url: 'category/list',
+                type: 'GET',
+                success: function(res) {
+                    if (res.code === 200) {
+                        renderCategories(res.data);
+                    }
+                }
+            });
+        }
+        
+        // 渲染分类列表
+        function renderCategories(categories) {
+            // 清空分类列表
+            $('#categoryList').empty();
+            $('#categoryNavItems').empty();
+            $('#categoryFilter').html('<option value="">全部</option>');
+            $('#eventCategory').html('<option value="">无分类</option>');
+            
+            // 添加分类导航项
+            categories.forEach(function(category) {
+                // 添加分类导航项
+                $('#categoryNavItems').append(`
+                    <a class="nav-link ml-3" href="#" data-section="events" data-category="${category.id}">
+                        <i class="fas fa-tag mr-2"></i>${category.name}
+                    </a>
+                `);
+                
+                // 添加分类过滤选项
+                $('#categoryFilter').append(`
+                    <option value="${category.id}">${category.name}</option>
+                `);
+                
+                // 添加事件分类选项
+                $('#eventCategory').append(`
+                    <option value="${category.id}">${category.name}</option>
+                `);
+                
+                // 添加分类卡片
+                $('#categoryList').append(`
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${category.name}</h5>
+                                <p class="card-text text-muted">
+                                    <small>创建时间：${formatDate(category.createTime)}</small>
+                                </p>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#addCategoryModal" data-id="${category.id}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+            
+            // 为分类导航项添加点击事件
+            $('#categoryNavItems .nav-link').click(function() {
+                $('.nav-link').removeClass('active');
+                $(this).addClass('active');
+                
+                const categoryId = $(this).data('category');
+                $('#categoryFilter').val(categoryId);
+                
+                $('.section').addClass('d-none');
+                $('#eventsSection').removeClass('d-none');
+                
+                getEvents();
+            });
+        }
+        
+        // 获取事件列表
+        function getEvents() {
+            const categoryId = $('#categoryFilter').val();
+            const priority = $('#priorityFilter').val();
+            const status = $('#statusFilter').val();
+            const keyword = $('#keywordFilter').val();
+            
+            let url = 'event/search?';
+            if (categoryId) url += `categoryId=${categoryId}&`;
+            if (priority) url += `priority=${priority}&`;
+            if (status) url += `status=${status}&`;
+            if (keyword) url += `keyword=${keyword}`;
+            
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(res) {
+                    if (res.code === 200) {
+                        renderEvents(res.data);
+                    }
+                }
+            });
+        }
+        
+        // 渲染事件列表
+        function renderEvents(events) {
+            // 清空事件列表
+            $('#eventList').empty();
+            
+            if (events.length === 0) {
+                $('#eventList').html('<div class="alert alert-info">没有符合条件的事件</div>');
+                return;
+            }
+            
+            // 添加事件卡片
+            events.forEach(function(event) {
+                let priorityClass = '';
+                let priorityText = '';
+                let priorityIndicator = '';
+                
+                // 设置优先级样式和文本
+                switch (event.priority) {
+                    case 2:
+                        priorityClass = 'priority-high';
+                        priorityText = '<span class="badge badge-danger">高</span>';
+                        priorityIndicator = '<span class="float-right text-danger"><i class="fas fa-exclamation-circle"></i> 重要</span>';
+                        break;
+                    case 1:
+                        priorityClass = 'priority-medium';
+                        priorityText = '<span class="badge badge-warning">中</span>';
+                        priorityIndicator = '<span class="float-right text-warning"><i class="fas fa-exclamation"></i> 中等</span>';
+                        break;
+                    default:
+                        priorityClass = 'priority-low';
+                        priorityText = '<span class="badge badge-success">低</span>';
+                        priorityIndicator = '';
+                }
+                
+                let statusClass = event.status === 1 ? 'status-completed' : '';
+                let statusText = event.status === 1 ? 
+                    '<span class="badge badge-secondary">已完成</span>' : 
+                    '<span class="badge badge-info">未完成</span>';
+                
+                let categoryText = event.category ? 
+                    `<span class="badge badge-primary">${event.category.name}</span>` : 
+                    '';
+                
+                $('#eventList').append(`
+                    <div class="card event-card ${priorityClass} ${statusClass} mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">${event.title} ${priorityIndicator}</h5>
+                                <div>
+                                    ${priorityText}
+                                    ${statusText}
+                                    ${categoryText}
+                                </div>
+                            </div>
+                            <p class="card-text mt-2">${event.content || '无内容描述'}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">创建时间：${formatDate(event.createTime)}</small>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#addEventModal" data-id="${event.id}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteEvent(${event.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-${event.status === 1 ? 'warning' : 'success'}" onclick="toggleEventStatus(${event.id}, ${event.status})">
+                                        <i class="fas fa-${event.status === 1 ? 'undo' : 'check'}"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+        
+        // 删除分类
+        function deleteCategory(id) {
+            if (confirm('确定要删除该分类吗？删除后不可恢复！')) {
+                $.ajax({
+                    url: `category/delete/${id}`,
+                    type: 'DELETE',
+                    success: function(res) {
+                        if (res.code === 200) {
+                            getCategories();
+                            getEvents();
+                        } else {
+                            alert(res.message);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 删除事件
+        function deleteEvent(id) {
+            if (confirm('确定要删除该事件吗？删除后不可恢复！')) {
+                $.ajax({
+                    url: `event/delete/${id}`,
+                    type: 'DELETE',
+                    success: function(res) {
+                        if (res.code === 200) {
+                            getEvents();
+                        } else {
+                            alert(res.message);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 切换事件状态
+        function toggleEventStatus(id, status) {
+            const newStatus = status === 1 ? 0 : 1;
+            $.ajax({
+                url: `event/status/${id}/${newStatus}`,
+                type: 'PUT',
+                success: function(res) {
+                    if (res.code === 200) {
+                        getEvents();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("更新状态错误:", error);
+                    alert("更新状态失败: " + error);
+                }
+            });
+        }
+        
+        // 格式化日期
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleString();
+        }
+    </script>
+</body>
+</html> 
